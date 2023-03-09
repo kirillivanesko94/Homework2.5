@@ -1,51 +1,53 @@
 package com.skypro.employeebook.servise;
 
-import com.skypro.employeebook.employee.Employee;
-import com.skypro.employeebook.exception.EmployeeAlreadyAddedException;
 import com.skypro.employeebook.exception.EmployeeNotFoundException;
+import com.skypro.employeebook.model.Employee;
+import com.skypro.employeebook.exception.EmployeeAlreadyAddedException;
 import com.skypro.employeebook.exception.EmployeeStorageIsFullException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
-public class EmployeeService {
+public class EmployeeService implements EmployeeServiceInterface {
     private final int MAX_COUNT = 2;
-    private final List<Employee> employees = new ArrayList<>();
+    private final Map<Integer, Employee> employees = new HashMap<>();
 
-    public Employee addEmployee(String firstName, String lastName) {
+    @Override
+    public Employee addEmployee(String firstName, String lastName, Integer passport) {
         if (employees.size() == MAX_COUNT) {
             throw new EmployeeStorageIsFullException(employees.size());
         }
-        Employee employee = new Employee(firstName, lastName);
-        if (employees.contains(employee)) {
+        Employee employee = new Employee(firstName, lastName, passport);
+        if (employees.containsKey(passport)) {
             throw new EmployeeAlreadyAddedException(firstName, lastName);
         }
-        employees.add(employee);
+        employees.put(employee.getPassport(), employee);
 
         return employee;
     }
 
-    public Employee findEmployee(String firstName, String lastName) {
-        for (Employee e : employees) {
-            if (e != null && firstName.equals(e.getFirstName()) && lastName.equals(e.getLastName())) {
-                Employee employee;
-                employee = e;
-                return employee;
-            }
+    @Override
+    public Employee findEmployee(Integer passport) {
+        if (employees.get(passport) == null) {
+            throw new EmployeeNotFoundException("Сотрудник не найден");
         }
-        throw new EmployeeNotFoundException(firstName, lastName);
+        return employees.get(passport);
     }
 
-    public Employee removeEmployee(String firstName, String lastName) {
-        Employee employee = findEmployee(firstName, lastName);
-        employees.remove(employee);
-        return employee;
+    @Override
+    public String removeEmployee(Integer passport) {
+        Employee employee = findEmployee(passport);
+        if (employees.get(passport) == null) {
+            throw new EmployeeNotFoundException("Сотрудник не найден");
+        }
+        employees.remove(passport);
+        return String.format("Сотрудник %s %s удален", employee.getFirstName(), employee.getLastName());
     }
 
-
-    public List<Employee> printAllEmployees() {
+    @Override
+    public Map<Integer, Employee> printAllEmployees() {
         return employees;
     }
 
