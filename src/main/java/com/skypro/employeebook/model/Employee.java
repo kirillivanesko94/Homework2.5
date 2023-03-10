@@ -1,4 +1,4 @@
-package com.skypro.employeebook.employee;
+package com.skypro.employeebook.model;
 
 import java.util.Objects;
 
@@ -6,9 +6,12 @@ import java.util.Objects;
         private final String firstName;
         private final String lastName;
 
-        public Employee(String firstName, String lastName) {
+        private final Integer passport;
+
+        public Employee(String firstName, String lastName, Integer passport) {
             this.firstName = firstName;
             this.lastName = lastName;
+            this.passport = passport;
         }
 
         public String getFirstName() {
@@ -19,17 +22,22 @@ import java.util.Objects;
             return lastName;
         }
 
+        public Integer getPassport() {
+            return passport;
+        }
+
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             Employee employee = (Employee) o;
-            return firstName.equals(employee.firstName) && lastName.equals(employee.lastName);
+            return Objects.equals(firstName, employee.firstName) && Objects.equals(lastName, employee.lastName) && Objects.equals(passport, employee.passport);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(firstName, lastName);
+            return Objects.hash(firstName, lastName, passport);
         }
 
         @Override
@@ -37,6 +45,7 @@ import java.util.Objects;
             return "Employee{" +
                     "firstName='" + firstName + '\'' +
                     ", lastName='" + lastName + '\'' +
+                    ", passport=" + passport +
                     '}';
         }
     }
